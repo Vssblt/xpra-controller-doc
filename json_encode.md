@@ -152,7 +152,7 @@
 	*dicom 图像路径类型，可以是文件夹，也可以是文件，可能的值：files/folders*  
 	
 	path : array  
-	*dicom 图像的文件夹路径*  
+	*dicom 图像的文件或文件夹路径*  
 	
 	http_address : string  
 	*MIV Http服务器，格式：[IP]:[PORT]*  
