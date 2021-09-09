@@ -56,6 +56,15 @@
 	*缩放比例，可选*  
 	*值通常为 dpi / 96，默认为 1*
 
+	hospital_id : string  
+	*医院 id*
+
+	organization_id : string  
+	*机构 id*
+
+	host : string  
+	*云域名*
+
 示例：
 ```
 {
@@ -68,7 +77,10 @@
 			"user_token" : "d26b65b5ec8a5d54e99f5159a9b04919",
 			"session_id" : "f0d64d6cc4a53dc3eff8a9ccd2879dba",
 			"user_name" : "Admin",
-			"scale_factor" : 1.5
+			"scale_factor" : 1.5,
+			"hospital_id": "a53dc3eff8a9cc",
+			"organization_id": "3effccaoeu1i45",
+			"host": "pdrmyy.msunhis.com"
 		}
 	}
 }
@@ -152,7 +164,7 @@
 	*dicom 图像路径类型，可以是文件夹，也可以是文件，可能的值：files/folders*  
 	
 	path : array  
-	*dicom 图像的文件或文件夹路径*  
+	*dicom 图像的文件夹路径*  
 	
 	http_address : string  
 	*MIV Http服务器，格式：[IP]:[PORT]*  
