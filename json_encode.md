@@ -10,6 +10,7 @@
 		* [1.2 回复数据包（reply packet）](#12-回复数据包reply-packet)
 		* [1.3 消息数据包（message packet）](#13-消息数据包message-packet)
 			* [MIV 异常关闭](#miv-异常关闭)
+			* [广播消息](#广播消息)
 	* [二、数据包类型](#二数据包类型)
 	* [三、指令类型](#三指令类型)
 	* [四、错误码](#四错误码)
@@ -160,12 +161,24 @@
 	session_id : string  
 	*会话token，对应会话，即http Session_id*  
 	
-	path_type : string  
-	*dicom 图像路径类型，可以是文件夹，也可以是文件，可能的值：files/folders*  
+	type : string  
+	*dicom 图像获取途径，可以是文件夹和文件本地打开，也可以是Query/Retrieve，可能的值：files/folders/QueryRetrieve*  
 	
-	path : array  
-	*dicom 图像的文件夹路径*  
+	ip : string  
+	*QueryRetrieve 地址*  
 	
+	port : string  
+	*QueryRetrieve 端口*  
+
+	client_ae : string  
+	*QueryRetrieve Client AE*  
+
+	server_ae : string  
+	*QueryRetrieve Server AE*  
+
+	memo : string  
+	*QueryRetrieve Memo*  
+
 	http_address : string  
 	*MIV Http服务器，格式：[IP]:[PORT]*  
 	
@@ -200,12 +213,11 @@
 	*图像数据追加模式*  
 	*可能的参数为"append"或者"new"，前者为追加模式，后者为清理再浏览*  
 	
-	alternate_addr : string  
-	*PACS1.0 IP，格式为-1或[IP]:[PORT]*  
-
 
 示例：
 ```
+示例一：
+
 {
 	"packet_id" : "847306e59b2868b4ba6248384075adb9",
 	"type" : "command",
@@ -214,8 +226,10 @@
 		"command" : "update",
 		"data" : {
 			"session_id"     : "d26b65b5ec8a5d54e99f5159a9b04919",
-			"path_type"      : "files",
-			"path"           : ["/path/to/file/1", "/path/to/file/2", "/path/to/file/3"],
+			"type"           : "files",
+			"data" : {
+				"path" : ["/path/to/file/1", "/path/to/file/2", "/path/to/file/3"] 
+			},
 			"http_addr"      : "192.168.1.1:1333",
 			"patient_id"     : "idididididid",
 			"study_uid"      : "idididididid",
@@ -226,8 +240,69 @@
 			"hospital_id"    : "idididididid",
 			"is_clinic"      : "0",
 			"card_code"      : "idididididid",
-			"mode"           : "new",
-			"alternate_addr" : "192.168.1.2:5612"
+			"mode"           : "new"
+		}
+	}
+}
+
+示例二：
+
+{
+	"packet_id" : "847306e59b2868b4ba6248384075adb9",
+	"type" : "command",
+	"reply" : false, 
+	"data" : {
+		"command" : "update",
+		"data" : {
+			"session_id"     : "d26b65b5ec8a5d54e99f5159a9b04919",
+			"type"           : "folders",
+			"data" : {
+				"path" : ["/path/to/folder/1", "/path/to/folder/2", "/path/to/folder/3"] 
+			},
+			"http_addr"      : "192.168.1.1:1333",
+			"patient_id"     : "idididididid",
+			"study_uid"      : "idididididid",
+			"reg_id"         : "idididididid",
+			"browse_mode"    : "0",
+			"user_sys_id"    : "idididididid",
+			"can_print"      : "0",
+			"hospital_id"    : "idididididid",
+			"is_clinic"      : "0",
+			"card_code"      : "idididididid",
+			"mode"           : "new"
+		}
+	}
+}
+
+示例三：
+
+{
+	"packet_id" : "847306e59b2868b4ba6248384075adb9",
+	"type" : "command",
+	"reply" : false, 
+	"data" : {
+		"command" : "update",
+		"data" : {
+			"session_id"     : "d26b65b5ec8a5d54e99f5159a9b04919",
+			"type"           : "QueryRetrieve",
+			"data" : {
+				"ip" : "1.1.1.1",
+				"port" : "1234",
+				"client_ae" : "pacs",
+				"server_ae" : "pacs_server",
+				"memo" : "test"
+			},
+			"http_addr"      : "192.168.1.1:1333",
+			"patient_id"     : "idididididid",
+			"study_uid"      : "idididididid",
+			"reg_id"         : "idididididid",
+			"browse_mode"    : "0",
+			"user_sys_id"    : "idididididid",
+			"can_print"      : "0",
+			"hospital_id"    : "idididididid",
+			"is_clinic"      : "0",
+			"card_code"      : "idididididid",
+			"mode"           : "new"
 		}
 	}
 }
@@ -278,9 +353,11 @@
 
 ### 1.3 消息数据包（message packet）
 
-一次性消息数据包，用于传递消息，在该应用场景下，由服务器发往客户端，通知客户端 MIV 异常关闭（通常是服务器或 MIV 自己的原因），该类型数据包不会返回回复数据包。
+一次性消息数据包，用于传递消息。
 
 #### MIV 异常关闭
+
+在该应用场景下，由服务器发往客户端，通知客户端 MIV 异常关闭（通常是服务器或 MIV 自己的原因），该类型数据包不会返回回复数据包。
 
 * 参数
 	
@@ -299,10 +376,59 @@
 {
 	"type" : "message",
 	"data" : {
-		"session_id" : "5b2cac76836e7acdc3c33269cf27be06"
+		"message": "miv_closed",
+		"data" :{
+			"session_id" : "5b2cac76836e7acdc3c33269cf27be06"
+		}
 	}
 }
 ```
+
+
+#### 广播消息
+
+向服务器发送广播消息，广播消息将显示在当前服务器上的所有打开的影像浏览器上。
+
+* 参数
+
+	type : string  
+	*数据包类型*  
+
+	data : object  
+	*数据体*  
+
+	session_id : string  
+	*会话token，对应会话，即http Session_id*  
+
+	title : string   
+	*标题内容*  
+
+	date : string   
+	*日期*  
+
+	from : string   
+	*发送人*  
+
+	message : string   
+	*广播消息内容*  
+
+示例：
+```
+{
+	"type" : "message",
+	"data" : {
+		"message": "broadcast",
+		"data" :{
+			"session_id" : "5b2cac76836e7acdc3c33269cf27be06",
+			"title" : "标题", 
+			"date" : "2020-01-01", 
+			"from" : "管理员", 
+			"message" : "你好"
+		}
+	}
+}
+```
+
 
 
 ## 二、数据包类型
