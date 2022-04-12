@@ -92,6 +92,14 @@
   
   返回一个 reply 类型数据包，详见 1.2。
 
+* 注意：
+
+  当接口返回数据时，会返回参数 `display`，将该参数通过以下方式拼接，可获得一个 URL，通过该 URL 可打开 MIV 页面。  
+  拼接规则：
+  ```
+  http://[ip]:[port]/index.html?username=msun&password0=[display]&password1=[display]&display=[display]&encoding=jpg&clipboard=true&keyboard=false&notifications=false&tray=false&video=true&sound=false&floating_menu=false
+  ```
+
 
 #### 1.1.2 关闭 MIV
 
@@ -136,14 +144,6 @@
 * 返回数据包：
   
   返回一个 reply 类型数据包，详见 1.2。  
-
-* 注意：
-
-  当接口返回数据时，会返回参数 `display`，将该参数通过以下方式拼接，可获得一个 URL，通过该 URL 可打开 MIV 页面。  
-  拼接规则：
-  ```
-  http://[ip]:[port]/index.html?username=msun&password0=[display]&password1=[display]&display=[display]&encoding=jpg&clipboard=true&keyboard=false&notifications=false&tray=false&video=true&sound=false&floating_menu=false
-  ```
 
 
 #### 1.1.3 切换病人图像 
