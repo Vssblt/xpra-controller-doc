@@ -378,7 +378,7 @@
   "data" : {
     "command" : "ActionToggle",
     "data" : {
-      "action" : "full3dMode",
+      "action" : "ModeAuto3D",
       "session_id" : "d26b65b5ec8a5d54e99f5159a9b04919"
     }
   }
