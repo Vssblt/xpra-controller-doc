@@ -532,10 +532,10 @@
 ## 三、事件类型
 | Action              | 描述                                                            | 工具栏         | 类型     |
 |---------------------|-----------------------------------------------------------------|----------------|----------|
-| ModeAuto3D          | 3D Panel 模式，此模式下加载的图像将自动三位重建                 | 包含完整工具栏 | MIV 模式 |
-| ModeSingle3d        | 3D 独立模式，此模式下加载的图像将自动三位重建                   | 无工具栏       | MIV 模式 |
-| ModeSingle3dMip     | 3D 独立 Mip 模式，此模式下加载图像自动三位重建并进入 Mip 模式   | 无工具栏       | MIV 模式 |
-| ModeSingle3dMinp    | 3D 独立 Minp 模式，此模式下加载图像自动三位重建并进入 Minp 模式 | 无工具栏       | MIV 模式 |
+| ModeAuto3D          | 3D Panel 模式，此模式下加载的图像将自动三维重建                 | 包含完整工具栏 | MIV 模式 |
+| ModeSingle3d        | 3D 独立模式，此模式下加载的图像将自动三维重建                   | 无工具栏       | MIV 模式 |
+| ModeSingle3dMip     | 3D 独立 Mip 模式，此模式下加载图像自动三维重建并进入 Mip 模式   | 无工具栏       | MIV 模式 |
+| ModeSingle3dMinp    | 3D 独立 Minp 模式，此模式下加载图像自动三维重建并进入 Minp 模式 | 无工具栏       | MIV 模式 |
 | ActionFocusViewMip  | 将当前窗口切换到 MIP 模式，仅对当前图像生效                     |                | 渲染类型 |
 | ActionFocusViewMinp | 将当前窗口切换到 MinP 模式，金对当前图像生效                    |                | 渲染类型 |
 
