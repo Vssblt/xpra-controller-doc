@@ -2,6 +2,7 @@
 <!-- vim-markdown-toc GitLab -->
 
 * [Xpra-Controller 程序 Json 数据交换协议](#xpra-controller-程序-json-数据交换协议)
+  * [Q&A](#qa)
   * [一、格式：](#一格式)
     * [1.1 指令数据包（command packet）](#11-指令数据包command-packet)
       * [1.1.1 启动 MIV](#111-启动-miv)
@@ -21,7 +22,19 @@
 
 # Xpra-Controller 程序 Json 数据交换协议
 
+## Q&A
+
+* **Q：如何使用三维重建服务？**  
+  A：通过调用 HTTP 或 Socket 接口执行以下流程：启动 MIV -> 通过返回的URL打开该页面 -> 发送指令切换浏览模式或切换患者图像
+
+* **Q：如何测试？用什么服务器测试？**  
+  A：公司内部 Http 协议可使用服务器：`http://10.68.137.21:12002`，Socket 协议使用：`tcp://10.68.137.21:3008`。
+
 ## 一、格式：
+
+若使用 HTTP 协议，以下接口调用全部为`application/json` 格式的正文，请求方法为`POST`，`charset` 为 `UTF-8`。
+
+HTTP 协议请忽略回复数据包。
 
 ### 1.1 指令数据包（command packet）
 
@@ -47,10 +60,10 @@
   *指令类型，详见列表 3.1*  
   
   **user_token : string**  
-  *用户token，对应用户，可选*  
+  *用户token，标识用户*  
   
   **session_id : string**  
-  *会话token，对应会话，即http Session_id*  
+  *会话token，标识会话（session），即 http 的 Session_id*  
   
   **user_name : string**  
   *用户名，可选*
@@ -395,7 +408,8 @@
 
 ### 1.2 回复数据包（reply packet）
 
-仅一种格式，且仅在启用回复数据包时发送，即"reply"等于true时，格式如下：
+仅对 Socket 通信方式有效。
+仅在启用回复数据包时发送，即"reply"等于true时，格式如下：
 
 * 参数：
   
