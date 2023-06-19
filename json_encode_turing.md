@@ -140,6 +140,7 @@
 | data.session_id | string | 会话token，对应会话，即http Session_id                                                                                                                                                         |
 | data.type       | string | 图像来源类型，dicom 图像获取途径，可以是服务端文件夹和文件，也可以是Query/Retrieve（QR 协议，一种 Dicom 数据传输协议），还可以是 http 链接。可能的值：files/folders/QueryRetrieve/httpDownload |
 | data.data       | object | 图像源的参数列表，根据上一个参数的值选择下列表格中的参数格式                                                                                                                                   |
+| data.http_addr | string | 图灵医疗影像中心地址，例如：10.10.10.10:13333                                                                                                                                                   |
 | data.patient_id | string | 患者 ID                                                                                                                                                                                        |
 | data.study_uid  | string | study instance id                                                                                                                                                                              |
 | data.mode       | string | 图像数据浏览模式，可能的参数为"append"或者"new"，append 不清空当前正在浏览的三维图像，直接加载新的图像。new 先清空当前正在浏览的图像，再加载新的图像。                                         |
@@ -188,6 +189,7 @@
       "data" : {
         "path" : ["/path/to/file/1", "/path/to/file/2", "/path/to/file/3"] 
       },
+      "http_addr"      : "192.168.1.1:1333",
       "patient_id"     : "idididididid",
       "study_uid"      : "idididididid",
       "mode"           : "new"
@@ -207,6 +209,7 @@
       "data" : {
         "path" : ["/path/to/folder/1", "/path/to/folder/2", "/path/to/folder/3"] 
       },
+      "http_addr"      : "192.168.1.1:1333",
       "patient_id"     : "idididididid",
       "study_uid"      : "idididididid",
       "mode"           : "new"
@@ -230,6 +233,7 @@
         "server_ae" : "pacs_server",
         "memo" : "test"
       },
+      "http_addr"      : "192.168.1.1:1333",
       "patient_id"     : "idididididid",
       "study_uid"      : "idididididid",
       "mode"           : "new"
@@ -248,6 +252,7 @@
       "data" : {
         "uri" : ["http://1.1.1.1/1.dcm", "http://1.1.1.1/2.dcm", "http://1.1.1.1/3.dcm"] 
       },
+      "http_addr"      : "192.168.1.1:1333",
       "patient_id"     : "idididididid",
       "study_uid"      : "idididididid",
       "mode"           : "new"
