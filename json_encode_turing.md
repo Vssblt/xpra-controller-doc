@@ -9,6 +9,7 @@
             * [1.1.2 关闭 MIV](#112-关闭-miv)
             * [1.1.3 加载患者图像](#113-加载患者图像)
             * [1.1.4 触发事件](#114-触发事件)
+                * [1.1.4.1 触发 ROI 重建事件](#1141-触发-roi-重建事件)
         * [1.2 回复数据包（reply packet）](#12-回复数据包reply-packet)
     * [二、数据包类型](#二数据包类型)
         * [2.1 数据包类型](#21-数据包类型)
@@ -25,11 +26,14 @@
 
 ## Q&A
 
+注意：三维重建服务是一个**状态机**，协议中的 session id 本质上是状态机的上下文。
+
 * **Q：如何使用三维重建服务？**  
-  A：通过调用 HTTP 或 Socket 接口执行以下流程：启动 MIV -> 通过返回的URL打开页面 -> 发送指令切换浏览模式（可选） -> 加载患者图像 -> 关闭 MIV
+  A：通过调用 HTTP 或 Socket 接口执行以下流程：启动 MIV -> 通过返回的URL打开页面 -> 发送指令切换浏览模式（可选） -> 加载患者图像（可以根据阅片需求多次切换） -> 关闭 MIV（阅片完毕后执行关闭）
 
 * **Q：如何测试？用什么服务器测试？**  
-  A：公司内部 Http 协议可使用服务器：`http://10.68.137.21:12002`，Socket 协议使用：`tcp://10.68.137.21:3008`。
+  A：公司内部 Http 协议可使用服务器：`http://10.67.79.253:12002`，Socket 协议使用：`tcp://10.67.79.253:3008`。  
+
 
 ## 一、格式：
 
@@ -268,7 +272,7 @@
 
 #### 1.1.4 触发事件  
 
-由客户端发出，服务端处理，用于触发影像浏览器事件。
+由客户端发出，服务端处理，用于触发影像浏览器的功能和事件。
 
 * 参数：
 
@@ -300,6 +304,88 @@
   
   返回一个 reply 类型数据包，详见 1.2。
 
+##### 1.1.4.1 触发 ROI 重建事件
+
+一个特殊类型事件，在三维重建模式下，裁剪重建区域（长方体区域），并显示 ROI 高亮  
+
+* 参数：
+
+| 字段名（Field）                 | 类型   | 描述（Description）                                   |
+|---------------------------------|--------|-------------------------------------------------------|
+| type                            | string | 数据包类型，值为：command                             |
+| data                            | object | 数据体                                                |
+| data.command                    | string | 命令类型，值为：ActionToggle                          |
+| data.action                     | string | 事件名称，详见列表 4.1                                |
+| data.data.session_id            | string | 会话token，标识会话（sessio）                         |
+| cuboid_coordinates              | object | 长方体的坐标范围（左上角和右下角坐标）                |
+| cuboid_coordinates.top_left     | object | 长方体左上角的三维坐标                                |
+| cuboid_coordinates.bottom_right | object | 长方体右下角的三维坐标                                |
+| mask_download_link              | string | 掩膜下载链接                                          |
+| transfer_function_id            | string | 传递函数的ID                                          |
+| image_info                      | object | 影像信息                                              |
+| image_info.study_id             | string | 影像的检查号                                          |
+| image_info.series_id            | string | 影像的序列号                                          |
+| background_color                | object | 背景色                                                |
+| roi_highlighting                | string | ROI的ID列表，包括ID和对应的高亮颜色                   |
+| roi_highlighting.roi_id         | string | 一个ROI的ID                                           |
+| roi_highlighting.color          | object | ROI的ID的高亮颜色                                     |
+
+示例：
+``` json
+{
+  "type" : "command",
+  "data" : {
+    "command" : "ActionToggle",
+    "data" : {
+      "action" : "ROIHighlight",
+      "session_id" : "d26b65b5ec8a5d54e99f5159a9b04919"
+      "data" : {
+        "cuboid_coordinates": {
+          "top_left": {
+            "x": 10,
+            "y": 20,
+            "z": 30
+          },
+          "bottom_right": {
+            "x": 100,
+            "y": 150,
+            "z": 80
+          }
+        },
+        "mask_download_link": "https://example.com/mask123",
+        "transfer_function_id": "tf456",
+        "image_info": {
+          "study_id": "STUDY123",
+          "series_id": "SERIES456"
+        },
+        "background_color": {
+          "red": 0,
+          "green": 0,
+          "blue": 0
+        },
+        "roi_highlighting": [
+          {
+            "roi_id": "roi1",
+            "color": {
+              "red": 255,
+              "green": 0,
+              "blue": 0
+            }
+          },
+          {
+            "roi_id": "roi2",
+            "color": {
+              "red": 0,
+              "green": 255,
+              "blue": 0
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
 
 ### 1.2 回复数据包（reply packet）
 
@@ -355,14 +441,17 @@
 
 ### 4.1 事件类型
 
-| Action              | 描述                                                            | 工具栏         | 类型     |
-|---------------------|-----------------------------------------------------------------|----------------|----------|
-| ModeAuto3D          | 3D Panel 模式，此模式下加载的图像将自动三维重建                 | 包含完整工具栏 | MIV 模式 |
-| ModeSingle3d        | 3D 独立模式，此模式下加载的图像将自动三维重建                   | 无工具栏       | MIV 模式 |
-| ModeSingle3dMip     | 3D 独立 Mip 模式，此模式下加载图像自动三维重建并进入 Mip 模式   | 无工具栏       | MIV 模式 |
-| ModeSingle3dMinp    | 3D 独立 Minp 模式，此模式下加载图像自动三维重建并进入 Minp 模式 | 无工具栏       | MIV 模式 |
-| ActionFocusViewMip  | 将当前窗口切换到 MIP 模式，仅对当前图像生效                     |                | 渲染类型 |
-| ActionFocusViewMinp | 将当前窗口切换到 MinP 模式，金对当前图像生效                    |                | 渲染类型 |
+| Action                 | 描述                                                            | 工具栏         | 类型     |
+|------------------------|-----------------------------------------------------------------|----------------|----------|
+| ModeAuto3D             | 3D Panel 模式，加载的图像将自动三维重建                         | 包含完整工具栏 | MIV 模式 |
+| ModeSingle3d           | 3D 独立模式，加载的图像将自动三维重建                           | 无工具栏       | MIV 模式 |
+| ModeSingle3dMip        | 3D 独立 Mip 模式，加载图像自动三维重建并进入 Mip 模式           | 无工具栏       | MIV 模式 |
+| ModeSingle3dMinp       | 3D 独立 Minp 模式，加载图像自动三维重建并进入 Minp 模式         | 无工具栏       | MIV 模式 |
+| ModeBronchoscope       | 3D 支气管重建模式，加载图像自动三维重建并进入虚拟支气管镜模式   | 部分工具栏     | MIV 模式 |
+| ModeFullScreenSingle3D | 3D 全屏三维重建，加载图像自动进入全屏的三维重建模式             | 无工具栏       | MIV 模式 |
+| ActionFocusViewMip     | 将当前窗口切换到 MIP 模式，仅对当前图像生效                     |                | 渲染类型 |
+| ActionFocusViewMinp    | 将当前窗口切换到 MinP 模式，金对当前图像生效                    |                | 渲染类型 |
+| ROIHighlight           | 在三维重建模式下，裁剪重建区域（长方体区域），并显示 ROI 高亮   |                | 渲染类型 |
 
 ## 五、错误码
 
