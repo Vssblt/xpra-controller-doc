@@ -263,6 +263,35 @@
     }
   }
 }
+
+示例(HTTP Link)：
+{
+  "type" : "command",
+    "data" : {
+      "command" : "update",
+      "data" : {
+        "session_id" : "d26b65b5ec8a5d54e99f5159a9b04919",
+        "type"       : "HttpLinkDownload",
+        "data" : {
+          "uri" : [
+          {
+            "url" : "url1",
+            "headers" : []
+          }, 
+          {
+            "url" : "url2",
+            "headers" : []
+          }
+          ]
+        },
+        "http_addr"  : "192.168.1.1:1333",
+        "patient_id" : "idididididid",
+        "study_uid"  : "idididididid",
+        "mode"       : "new"
+      }
+    }
+}
+
 ```
 
 * 返回数据包：
